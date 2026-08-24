@@ -1,49 +1,30 @@
-print("Welcome to Expenses Tracker")
-expenses = []
-categories = [
-    "Food",
-    "Travel",
-    "Shopping",
-    "Bills",
-    "Entertainment",
-    "Education",
-    "Health",
-    "Others"
-]
+from flask import Flask, render_template
+from flask_cors import CORS
+import database as db
 
-while True:
-    print("\n===== MENU =====")
-    print("1. Add Expense")
-    print("2. View Expenses")
-    print("3. Delete Expense")
-    print("4. Monthly Summary")
-    print("5. Exit")
+app = Flask(__name__)
+CORS(app)
 
-    choice = input("Enter your choice: ")
-    if choice == "1":
-        amount = int(input("Enter amount: "))
+from routes.expenses import expenses_bp
+from routes.income import income_bp
+from routes.budgets import budgets_bp
+from routes.reports import reports_bp
+from routes.dashboard import dashboard_bp
 
-        print("\nSelect Category:")
-        for i in range(len(categories)):
-            print(i + 1, ".", categories[i])
+app.register_blueprint(expenses_bp)
+app.register_blueprint(income_bp)
+app.register_blueprint(budgets_bp)
+app.register_blueprint(reports_bp)
+app.register_blueprint(dashboard_bp)
 
-        category_choice = int(input("Enter category number: "))
-        category = categories[category_choice - 1]
 
-        note = input("Enter note: ")
+@app.route("/")
+def index():
+    return render_template("index.html")
 
-        expense = {
-            "id": len(expenses) + 1,
-            "amount": amount,
-            "category": category,
-            "note": note
-        }
 
-        expenses.append(expense)
-
-        print("Expense added successfully!")
-    elif choice == "5":
-        print("Thank you for using Expense Tracker!")
-        break
-    
-    
+if __name__ == "__main__":
+    db.init_db()
+    print("\n>>> Expenses Tracker is running!")
+    print(">>> Open your browser at: http://localhost:5000\n")
+    app.run(debug=True, port=5000)
